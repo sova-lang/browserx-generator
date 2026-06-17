@@ -1,6 +1,6 @@
 import type * as webidl from "webidl2";
 import type { Catalog, CollectedInterface } from "./loader";
-import { isVoidReturn, sovaIdent, translateType, type DocLookup, type MapperContext } from "./types";
+import { isVoidReturn, sovaIdent, translateType, BUILTIN_BUFFER_WRAPPABLES, type DocLookup, type MapperContext } from "./types";
 
 export type EmitFile = {
   path: string; // relative path under the output dir
@@ -885,6 +885,7 @@ function needsOptionalLift(sovaType: string, ctx: MapperContext): boolean {
   if (ctx.wrappable.has(sovaType)) return true;
   if (ctx.enums.has(sovaType)) return true;
   if (ctx.dictionaries.has(sovaType)) return true;
+  if (BUILTIN_BUFFER_WRAPPABLES.has(sovaType)) return true;
   return false;
 }
 

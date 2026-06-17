@@ -39,6 +39,30 @@ const PRIMITIVE_MAP: Record<string, string> = {
   bigint: "int",
 };
 
+export const BUFFER_UNION_TYPEDEF_FALLBACKS = new Map<string, string>([
+  ["ArrayBufferView", "ArrayBuffer"],
+  ["BufferSource", "ArrayBuffer"],
+  ["AllowSharedBufferSource", "ArrayBuffer"],
+]);
+
+export const BUILTIN_BUFFER_WRAPPABLES = new Set([
+  "ArrayBuffer",
+  "SharedArrayBuffer",
+  "DataView",
+  "Int8Array",
+  "Uint8Array",
+  "Uint8ClampedArray",
+  "Int16Array",
+  "Uint16Array",
+  "Int32Array",
+  "Uint32Array",
+  "BigInt64Array",
+  "BigUint64Array",
+  "Float16Array",
+  "Float32Array",
+  "Float64Array",
+]);
+
 export type DocLookup = {
   interfaceDoc(name: string): string | undefined;
   memberDoc(iface: string, member: string): string | undefined;
@@ -114,6 +138,10 @@ export function translateType(node: IDLTypeNode, ctx: MapperContext): SovaTypeMa
     return wrapNullable(node, leaf, leaf);
   }
 
+  if (BUILTIN_BUFFER_WRAPPABLES.has(leaf)) {
+    return wrapNullable(node, leaf, leaf);
+  }
+
   if (ctx.enums.has(leaf)) {
     return wrapNullable(node, leaf, undefined);
   }
@@ -126,6 +154,11 @@ export function translateType(node: IDLTypeNode, ctx: MapperContext): SovaTypeMa
   if (cbk) {
     const sig = callbackSignature(cbk, ctx);
     return wrapNullable(node, sig);
+  }
+
+  if (BUFFER_UNION_TYPEDEF_FALLBACKS.has(leaf)) {
+    const fallback = BUFFER_UNION_TYPEDEF_FALLBACKS.get(leaf)!;
+    return wrapNullable(node, fallback, fallback);
   }
 
   const td = ctx.typedefs.get(leaf);

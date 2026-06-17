@@ -25,6 +25,7 @@ export function emitFacade(): EmitFile[] {
     { path: "routing.sova", content: FACADE_ROUTING },
     { path: "geolocation.sova", content: FACADE_GEOLOCATION },
     { path: "channels.sova", content: FACADE_CHANNELS },
+    { path: "binary.sova", content: FACADE_BINARY },
   ];
 }
 
@@ -940,6 +941,201 @@ extern {
     }
     func __bxCloseChannel(c: any) = {
         frontend: "(c) => { if (c != null) c.close(); }"
+    }
+}
+`;
+
+const FACADE_BINARY = `package browserx on frontend
+
+/// ArrayBuffer wraps a JS \`ArrayBuffer\` handle - a raw fixed-length byte
+/// container used as the storage backing every typed array. Most users
+/// don't construct these directly; they receive one from \`Response.arrayBuffer()\`,
+/// \`FileReader\`, \`fetch\`, or the WebGL/WebRTC APIs.
+type ArrayBuffer {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func byteLength(): int { return __bxBufByteLength(this.handle) }
+    func slice(begin: int, end: int): ArrayBuffer {
+        return new ArrayBuffer(__bxBufSlice(this.handle, begin, end))
+    }
+}
+
+/// SharedArrayBuffer is the cross-thread variant of ArrayBuffer used with
+/// Atomics + workers. Same shape; different concurrency semantics.
+type SharedArrayBuffer {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func byteLength(): int { return __bxBufByteLength(this.handle) }
+}
+
+/// DataView reads / writes typed values at arbitrary byte offsets into an
+/// underlying ArrayBuffer with explicit endianness control.
+type DataView {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func byteLength(): int { return __bxBufByteLength(this.handle) }
+}
+
+/// Each typed array wraps a JS typed-array handle. The underlying memory is
+/// an ArrayBuffer; \`length\` is the element count (not bytes), \`at(i)\` and
+/// \`set(i, v)\` index into it. Use \`buffer()\` to get back the raw bytes.
+type Int8Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Uint8Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Uint8ClampedArray {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Int16Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Uint16Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Int32Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Uint32Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type BigInt64Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type BigUint64Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): int { return __bxTAGetInt(this.handle, i) }
+    func setAt(i: int, v: int) { __bxTASetInt(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Float16Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): float { return __bxTAGetFloat(this.handle, i) }
+    func setAt(i: int, v: float) { __bxTASetFloat(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Float32Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): float { return __bxTAGetFloat(this.handle, i) }
+    func setAt(i: int, v: float) { __bxTASetFloat(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+type Float64Array {
+    handle: any = none
+    new(handle: any) { this.handle = handle }
+    func length(): int { return __bxBufLength(this.handle) }
+    func at(i: int): float { return __bxTAGetFloat(this.handle, i) }
+    func setAt(i: int, v: float) { __bxTASetFloat(this.handle, i, v) }
+    func buffer(): ArrayBuffer { return new ArrayBuffer(__bxTABuffer(this.handle)) }
+}
+
+/// newArrayBuffer allocates a fresh ArrayBuffer of the given byte length.
+func newArrayBuffer(byteLength: int): ArrayBuffer {
+    return new ArrayBuffer(__bxNewArrayBuffer(byteLength))
+}
+
+/// uint8ArrayFromBytes wraps a Sova \`[]byte\` slice in a Uint8Array view.
+/// The underlying memory is copied on construction.
+func uint8ArrayFromBytes(bytes: []byte): Uint8Array {
+    return new Uint8Array(__bxUint8FromBytes(bytes))
+}
+
+/// uint8ArrayToBytes copies a Uint8Array's contents into a Sova \`[]byte\`.
+func uint8ArrayToBytes(arr: Uint8Array): []byte {
+    return __bxUint8ToBytes(arr.handle)
+}
+
+extern {
+    func __bxBufByteLength(h: any): int = {
+        frontend: "(h) => (h == null ? 0 : (h.byteLength | 0))"
+    }
+    func __bxBufLength(h: any): int = {
+        frontend: "(h) => (h == null ? 0 : (h.length | 0))"
+    }
+    func __bxBufSlice(h: any, begin: int, end: int): any = {
+        frontend: "(h, b, e) => (h == null ? null : h.slice(b, e))"
+    }
+    func __bxTAGetInt(h: any, i: int): int = {
+        frontend: "(h, i) => (h == null ? 0 : Number(h[i] ?? 0) | 0)"
+    }
+    func __bxTASetInt(h: any, i: int, v: int) = {
+        frontend: "(h, i, v) => { if (h != null) h[i] = v; }"
+    }
+    func __bxTAGetFloat(h: any, i: int): float = {
+        frontend: "(h, i) => (h == null ? 0 : Number(h[i] ?? 0))"
+    }
+    func __bxTASetFloat(h: any, i: int, v: float) = {
+        frontend: "(h, i, v) => { if (h != null) h[i] = v; }"
+    }
+    func __bxTABuffer(h: any): any = {
+        frontend: "(h) => (h == null ? null : h.buffer)"
+    }
+    func __bxNewArrayBuffer(n: int): any = {
+        frontend: "(n) => new ArrayBuffer(n)"
+    }
+    func __bxUint8FromBytes(bs: []byte): any = {
+        frontend: "(bs) => new Uint8Array(bs)"
+    }
+    func __bxUint8ToBytes(h: any): []byte = {
+        frontend: "(h) => Array.from(h || [])"
     }
 }
 `;
