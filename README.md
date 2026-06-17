@@ -1,6 +1,6 @@
 # browserx-generator
 
-The Sova-source emitter behind [`browserx`](../browserx/). Reads W3C WebIDL
+The Sova-source emitter behind [`browserx`](https://github.com/sova-lang/browserx). Reads W3C WebIDL
 from [`@webref/idl`](https://github.com/w3c/webref), translates each interface
 into a typed Sova wrapper, and writes the result to the sibling `browserx`
 package.
@@ -124,7 +124,7 @@ own repo (with its own `package.json` and `bun.lock`) means:
 ```bash
 bun update @webref/idl
 bun run generate:browserx
-git diff ../browserx/
+git diff browserx/
 ```
 
 Inspect the diff before committing - sometimes a new spec version trips a
