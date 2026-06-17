@@ -1,6 +1,6 @@
 import type * as webidl from "webidl2";
 import type { Catalog, CollectedInterface } from "./loader";
-import { isVoidReturn, sovaIdent, translateType, type MapperContext } from "./types";
+import { isVoidReturn, sovaIdent, translateType, type DocLookup, type MapperContext } from "./types";
 
 export type EmitFile = {
   path: string; // relative path under the output dir
@@ -70,6 +70,35 @@ const GROUPS: PackageGroup[] = [
     "SVGUseElement", "SVGDefsElement", "SVGSymbolElement", "SVGMarkerElement",
     "SVGTitleElement", "SVGDescElement",
   ] },
+  { file: "webgl.sova", members: [
+    "WebGLObject", "WebGLBuffer", "WebGLFramebuffer", "WebGLProgram",
+    "WebGLRenderbuffer", "WebGLShader", "WebGLTexture", "WebGLUniformLocation",
+    "WebGLActiveInfo", "WebGLShaderPrecisionFormat", "WebGLRenderingContext",
+    "WebGLContextEvent",
+    "WebGLQuery", "WebGLSampler", "WebGLSync", "WebGLTransformFeedback",
+    "WebGLVertexArrayObject", "WebGL2RenderingContext",
+  ] },
+  { file: "webrtc.sova", members: [
+    "RTCPeerConnection", "RTCSessionDescription", "RTCIceCandidate",
+    "RTCPeerConnectionIceEvent", "RTCPeerConnectionIceErrorEvent",
+    "RTCCertificate", "RTCRtpSender", "RTCRtpReceiver", "RTCRtpTransceiver",
+    "RTCDtlsTransport", "RTCIceTransport", "RTCIceCandidatePair",
+    "RTCTrackEvent", "RTCSctpTransport", "RTCDataChannel", "RTCDataChannelEvent",
+    "RTCDTMFSender", "RTCDTMFToneChangeEvent", "RTCStatsReport", "RTCError",
+    "RTCErrorEvent",
+  ] },
+  { file: "indexeddb.sova", members: [
+    "IDBRequest", "IDBOpenDBRequest", "IDBVersionChangeEvent", "IDBFactory",
+    "IDBDatabase", "IDBObjectStore", "IDBIndex", "IDBKeyRange", "IDBCursor",
+    "IDBCursorWithValue", "IDBTransaction",
+  ] },
+  { file: "mediasession.sova", members: [
+    "MediaSession", "MediaMetadata", "ChapterInformation",
+  ] },
+  { file: "webauthn.sova", members: [
+    "PublicKeyCredential", "AuthenticatorResponse",
+    "AuthenticatorAttestationResponse", "AuthenticatorAssertionResponse",
+  ] },
 ];
 
 // fileForInterface returns the group filename an interface belongs in. Interfaces not listed in
@@ -82,7 +111,7 @@ function fileForInterface(name: string): string {
   return "misc.sova";
 }
 
-export function emit(catalog: Catalog): EmitFile[] {
+export function emit(catalog: Catalog, docs?: DocLookup): EmitFile[] {
   const reachable = collectReachableNames(catalog);
   const ctx: MapperContext = {
     wrappable: new Set(catalog.interfaces.keys()),
@@ -90,6 +119,7 @@ export function emit(catalog: Catalog): EmitFile[] {
     enums: reachable.enums,
     callbacks: catalog.callbacks,
     typedefs: catalog.typedefs,
+    docs,
   };
 
   const byFile = new Map<string, string[]>();
@@ -218,7 +248,12 @@ function emitInterface(
   const externLines: string[] = [];
   const seen = new Set<string>(); // dedupe attr/op names across mixins (last wins, IDL semantics)
 
-  lines.push(`/// ${name} - generated WebIDL binding. From ${ci.spec} spec.`);
+  const ifaceDoc = ctx.docs?.interfaceDoc(name);
+  if (ifaceDoc) {
+    for (const line of formatDoc(ifaceDoc)) lines.push(line);
+  } else {
+    lines.push(`/// ${name} - generated WebIDL binding. From ${ci.spec} spec.`);
+  }
   lines.push(`type ${name} {`);
   lines.push(`    handle: any = none`);
   lines.push(`    private _iterCursor: int = 0`);
@@ -398,7 +433,12 @@ function emitAttribute(
   const externSetName = `__bx_${ifaceName}_set_${sovaName}`;
 
   lines.push(``);
-  lines.push(`    /// IDL attribute ${attr.name}: ${attr.idlType.idlType}`);
+  const attrDoc = ctx.docs?.memberDoc(ifaceName, attr.name);
+  if (attrDoc) {
+    for (const line of formatDoc(attrDoc, "    ")) lines.push(line);
+  } else {
+    lines.push(`    /// IDL attribute ${attr.name}: ${attr.idlType.idlType}`);
+  }
   if (typ.needsHandleWrap) {
     lines.push(`    func ${sovaName}(): ${typ.sovaType} {`);
     lines.push(`        return new ${typ.needsHandleWrap}(${externGetName}(this.handle))`);
@@ -567,7 +607,12 @@ function emitConstant(
   } else {
     return;
   }
-  lines.push(`/// ${ifaceName}.${c.name} - WebIDL const`);
+  const constDoc = ctx.docs?.memberDoc(ifaceName, c.name) ?? ctx.docs?.staticDoc(ifaceName, c.name);
+  if (constDoc) {
+    for (const line of formatDoc(constDoc)) lines.push(line);
+  } else {
+    lines.push(`/// ${ifaceName}.${c.name} - WebIDL const`);
+  }
   lines.push(`const ${sovaName}: ${sovaType} = ${valueStr}`);
 }
 
@@ -598,7 +643,12 @@ function emitConstructor(
   const paramSig = params.map((p) => `${p.name}: ${p.sova}`).join(", ");
   const argList = params.map((p) => p.name).join(", ");
 
-  lines.push(`/// ${ifaceName} factory - WebIDL constructor binding.`);
+  const ctorDoc = ctx.docs?.interfaceDoc(ifaceName);
+  if (ctorDoc) {
+    for (const line of formatDoc(`Constructor for ${ifaceName}.\n\n${ctorDoc}`)) lines.push(line);
+  } else {
+    lines.push(`/// ${ifaceName} factory - WebIDL constructor binding.`);
+  }
   lines.push(`func ${factoryName}(${paramSig}): ${ifaceName} {`);
   lines.push(`    return new ${ifaceName}(${externName}(${argList}))`);
   lines.push(`}`);
@@ -641,7 +691,12 @@ function emitOperation(
   const paramSig = params.map((p) => `${p.name}: ${p.sova}`).join(", ");
 
   lines.push(``);
-  lines.push(`    /// IDL operation ${op.name}`);
+  const opDoc = ctx.docs?.memberDoc(ifaceName, op.name!);
+  if (opDoc) {
+    for (const line of formatDoc(opDoc, "    ")) lines.push(line);
+  } else {
+    lines.push(`    /// IDL operation ${op.name}`);
+  }
   if (isVoid) {
     lines.push(`    func ${sovaName}(${paramSig}) {`);
     lines.push(`        ${externName}(this.handle${params.length > 0 ? ", " + params.map((p) => paramRef(p)).join(", ") : ""})`);
@@ -889,7 +944,12 @@ function emitStaticOperation(
   const paramSig = params.map((p) => `${p.name}: ${p.sova}`).join(", ");
   const sovaCallArgs = params.map((p) => p.name).join(", ");
 
-  lines.push(`/// ${ifaceName}.${opName} - WebIDL static method.`);
+  const staticDoc = ctx.docs?.staticDoc(ifaceName, opName) ?? ctx.docs?.memberDoc(ifaceName, opName);
+  if (staticDoc) {
+    for (const line of formatDoc(staticDoc)) lines.push(line);
+  } else {
+    lines.push(`/// ${ifaceName}.${opName} - WebIDL static method.`);
+  }
   if (isVoid) {
     lines.push(`func ${factoryName}(${paramSig}) {`);
     lines.push(`    ${externName}(${sovaCallArgs})`);
@@ -923,6 +983,12 @@ function emitStaticOperation(
 function capitalizeFirst(s: string): string {
   if (s.length === 0) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatDoc(doc: string, indent = ""): string[] {
+  const lines = doc.split("\n");
+  while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+  return lines.map((l) => `${indent}/// ${l}`);
 }
 
 // emitIndexedGetter synthesizes an `at(index: int): option<T>` method that maps to JS

@@ -616,6 +616,84 @@ func asMedia(el: Element): option<HTMLMediaElement> {
     return new HTMLMediaElement(el.handle)
 }
 
+/// asSvg narrows to SVGElement - the base of every SVG node.
+func asSvg(el: Element): option<SVGElement> {
+    if !__bxIsInstance(el.handle, "SVGElement") { return none }
+    return new SVGElement(el.handle)
+}
+
+/// asSvgRoot narrows to SVGSVGElement (the outer \`<svg>\` element).
+func asSvgRoot(el: Element): option<SVGSVGElement> {
+    if !__bxIsInstance(el.handle, "SVGSVGElement") { return none }
+    return new SVGSVGElement(el.handle)
+}
+
+/// asSvgGroup narrows to SVGGElement (the \`<g>\` group container).
+func asSvgGroup(el: Element): option<SVGGElement> {
+    if !__bxIsInstance(el.handle, "SVGGElement") { return none }
+    return new SVGGElement(el.handle)
+}
+
+/// asSvgPath narrows to SVGPathElement.
+func asSvgPath(el: Element): option<SVGPathElement> {
+    if !__bxIsInstance(el.handle, "SVGPathElement") { return none }
+    return new SVGPathElement(el.handle)
+}
+
+/// asSvgRect narrows to SVGRectElement.
+func asSvgRect(el: Element): option<SVGRectElement> {
+    if !__bxIsInstance(el.handle, "SVGRectElement") { return none }
+    return new SVGRectElement(el.handle)
+}
+
+/// asSvgCircle narrows to SVGCircleElement.
+func asSvgCircle(el: Element): option<SVGCircleElement> {
+    if !__bxIsInstance(el.handle, "SVGCircleElement") { return none }
+    return new SVGCircleElement(el.handle)
+}
+
+/// asSvgEllipse narrows to SVGEllipseElement.
+func asSvgEllipse(el: Element): option<SVGEllipseElement> {
+    if !__bxIsInstance(el.handle, "SVGEllipseElement") { return none }
+    return new SVGEllipseElement(el.handle)
+}
+
+/// asSvgLine narrows to SVGLineElement.
+func asSvgLine(el: Element): option<SVGLineElement> {
+    if !__bxIsInstance(el.handle, "SVGLineElement") { return none }
+    return new SVGLineElement(el.handle)
+}
+
+/// asSvgPolygon narrows to SVGPolygonElement.
+func asSvgPolygon(el: Element): option<SVGPolygonElement> {
+    if !__bxIsInstance(el.handle, "SVGPolygonElement") { return none }
+    return new SVGPolygonElement(el.handle)
+}
+
+/// asSvgPolyline narrows to SVGPolylineElement.
+func asSvgPolyline(el: Element): option<SVGPolylineElement> {
+    if !__bxIsInstance(el.handle, "SVGPolylineElement") { return none }
+    return new SVGPolylineElement(el.handle)
+}
+
+/// asSvgText narrows to SVGTextElement.
+func asSvgText(el: Element): option<SVGTextElement> {
+    if !__bxIsInstance(el.handle, "SVGTextElement") { return none }
+    return new SVGTextElement(el.handle)
+}
+
+/// asSvgImage narrows to SVGImageElement.
+func asSvgImage(el: Element): option<SVGImageElement> {
+    if !__bxIsInstance(el.handle, "SVGImageElement") { return none }
+    return new SVGImageElement(el.handle)
+}
+
+/// asSvgUse narrows to SVGUseElement (the \`<use>\` reuse / instancing primitive).
+func asSvgUse(el: Element): option<SVGUseElement> {
+    if !__bxIsInstance(el.handle, "SVGUseElement") { return none }
+    return new SVGUseElement(el.handle)
+}
+
 /// tagName reads the underlying handle's HTML tag in upper-case (\`"DIV"\`, \`"INPUT"\`,
 /// ...). The browser's normal contract - useful when narrowing by tag rather than by class.
 func tagName(el: Element): string {

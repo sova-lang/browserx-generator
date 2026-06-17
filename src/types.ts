@@ -39,12 +39,19 @@ const PRIMITIVE_MAP: Record<string, string> = {
   bigint: "int",
 };
 
+export type DocLookup = {
+  interfaceDoc(name: string): string | undefined;
+  memberDoc(iface: string, member: string): string | undefined;
+  staticDoc(iface: string, member: string): string | undefined;
+};
+
 export type MapperContext = {
   wrappable: Set<string>;
   dictionaries: Map<string, webidl.DictionaryType>;
   enums: Set<string>;
   callbacks: Map<string, webidl.CallbackType>;
   typedefs: Map<string, webidl.TypedefType>;
+  docs?: DocLookup;
 };
 
 export type NameSets = MapperContext;

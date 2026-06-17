@@ -14,6 +14,7 @@ import { dirname, join, resolve } from "node:path";
 import { loadCatalog } from "./loader";
 import { emit } from "./emit";
 import { emitFacade } from "./facade";
+import { loadDocIndex } from "./docs";
 
 function parseArgs(argv: string[]): { out: string; keepExisting: boolean } {
   let out = "./out";
@@ -36,12 +37,15 @@ console.log("loading WebIDL catalog (@webref/idl)...");
 const catalog = await loadCatalog();
 console.log(`  loaded ${catalog.specs.length} specs, ${catalog.interfaces.size} interfaces after subset filtering`);
 
+console.log("loading MDN docs from typescript lib.dom.d.ts...");
+const docs = loadDocIndex();
+
 const generatedDir = join(out, "generated");
 if (!keepExisting && existsSync(generatedDir)) {
   rmSync(generatedDir, { recursive: true, force: true });
 }
 
-const files = [...emit(catalog), ...emitFacade()];
+const files = [...emit(catalog, docs), ...emitFacade()];
 mkdirSync(out, { recursive: true });
 for (const f of files) {
   const fullPath = join(out, f.path);

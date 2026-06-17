@@ -138,6 +138,77 @@ export const SUBSET = {
     "SVGTitleElement",
     "SVGDescElement",
   ],
+
+  webgl1: [
+    "WebGLObject",
+    "WebGLBuffer",
+    "WebGLFramebuffer",
+    "WebGLProgram",
+    "WebGLRenderbuffer",
+    "WebGLShader",
+    "WebGLTexture",
+    "WebGLUniformLocation",
+    "WebGLActiveInfo",
+    "WebGLShaderPrecisionFormat",
+    "WebGLRenderingContext",
+    "WebGLContextEvent",
+  ],
+
+  webgl2: [
+    "WebGLQuery",
+    "WebGLSampler",
+    "WebGLSync",
+    "WebGLTransformFeedback",
+    "WebGLVertexArrayObject",
+    "WebGL2RenderingContext",
+  ],
+
+  webrtc: [
+    "RTCPeerConnection",
+    "RTCSessionDescription",
+    "RTCIceCandidate",
+    "RTCPeerConnectionIceEvent",
+    "RTCPeerConnectionIceErrorEvent",
+    "RTCCertificate",
+    "RTCRtpSender",
+    "RTCRtpReceiver",
+    "RTCRtpTransceiver",
+    "RTCDtlsTransport",
+    "RTCIceTransport",
+    "RTCIceCandidatePair",
+    "RTCTrackEvent",
+    "RTCSctpTransport",
+    "RTCDataChannel",
+    "RTCDataChannelEvent",
+    "RTCDTMFSender",
+    "RTCDTMFToneChangeEvent",
+    "RTCStatsReport",
+    "RTCError",
+    "RTCErrorEvent",
+  ],
+
+  IndexedDB: [
+    "IDBRequest",
+    "IDBOpenDBRequest",
+    "IDBVersionChangeEvent",
+    "IDBFactory",
+    "IDBDatabase",
+    "IDBObjectStore",
+    "IDBIndex",
+    "IDBKeyRange",
+    "IDBCursor",
+    "IDBCursorWithValue",
+    "IDBTransaction",
+  ],
+
+  mediasession: ["MediaSession", "MediaMetadata", "ChapterInformation"],
+
+  webauthn: [
+    "PublicKeyCredential",
+    "AuthenticatorResponse",
+    "AuthenticatorAttestationResponse",
+    "AuthenticatorAssertionResponse",
+  ],
 };
 
 SUBSET.dom.push("Event", "CustomEvent", "EventInit", "CustomEventInit");
