@@ -1,0 +1,16 @@
+{
+  "name": "browserx-generator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "bun run src/main.ts",
+    "generate:browserx": "bun run src/main.ts --out ../browserx/src"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@webref/idl": "^3.81.0",
+    "webidl2": "^24.5.0"
+  }
+}
